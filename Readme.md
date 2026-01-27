@@ -14,13 +14,13 @@ c.Improve safety and workflow efficiency.
 
 LOGIC FLOW:
 
-Voice and hand-wave commands are received from a microphone and a camera. These inputs are processed by Python, which then sends control commands to an ESP32 microcontroller that handles the necessary tasks.
+Voice commands and hand-wave gestures are captured using a microphone and camera. These inputs are processed using Python for voice and gesture recognition. The processed commands are then sent to an Arduino UNO via serial communication, which executes the required control actions.
 
 ACTION ITEMS:
 
 1.HARDWARE:
 
-        a.1 x ESP32 Dev Board (ESP32-WROOM-32)
+        a.1 × Arduino UNO
         b.USB Cable (USB-A to Micro-USB / Type-C) – 1
         c.Computer/Laptop with microphone and camera 
 
@@ -35,8 +35,8 @@ EXECUTION:
         a.Capture voice commands using a microphone.
         b.Detect hand gestures using a camera.
         c.Process commands in Python.
-        d.Send commands to ESP32 via serial/Wi-Fi.
-        e.Execute control actions through ESP32.  
+        d. Send control commands to Arduino UNO via serial communication.
+        e.Execute control actions through Arduino UNO. 
 
 INTERFACE:
 
