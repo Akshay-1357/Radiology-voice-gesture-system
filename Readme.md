@@ -35,7 +35,7 @@ EXECUTION:
         a.Capture voice commands using a microphone.
         b.Detect hand gestures using a camera.
         c.Process commands in Python.
-        d. Send control commands to Arduino UNO via serial communication.
+        d.Send control commands to Arduino UNO via serial communication.
         e.Execute control actions through Arduino UNO. 
 
 INTERFACE:
