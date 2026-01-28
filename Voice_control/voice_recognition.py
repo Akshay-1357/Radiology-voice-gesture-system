@@ -4,6 +4,8 @@
 
 import speech_recognition as sr
 import threading
+from core_logic.command_validator import RESET
+
 
 from core_logic.command_validator import (
     validate_and_process,
@@ -44,6 +46,10 @@ def start_voice_control(state_manager, arduino):
                     command = START_SCAN
                 elif "stop scan" in text:
                     command = STOP_SCAN
+                # 🔁 RESET SYSTEM (VOICE)
+                elif "reset" in text or "clear emergency" in text:
+                    command = RESET
+
                 elif "emergency" in text:
                     command = EMERGENCY_STOP
 

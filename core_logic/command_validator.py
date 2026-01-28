@@ -17,6 +17,8 @@ START_SCAN = "START_SCAN"
 STOP_SCAN = "STOP_SCAN"
 SCAN_COMPLETE = "SCAN_COMPLETE"
 EMERGENCY_STOP = "EMERGENCY_STOP"
+RESET = "RESET"
+
 RESET_SYSTEM = "RESET_SYSTEM"
 
 VALID_COMMANDS = [
@@ -24,6 +26,7 @@ VALID_COMMANDS = [
     STOP_SCAN,
     SCAN_COMPLETE,
     EMERGENCY_STOP,
+    RESET,
     RESET_SYSTEM
 ]
 
@@ -52,6 +55,21 @@ def validate_and_process(command, current_state):
             "message": "Emergency stop activated"
         }
     # -------- RESET SYSTEM --------
+    # -------- RESET SYSTEM --------
+    if command == RESET:
+        if current_state == "EMERGENCY":
+            return {
+                "next_state": "IDLE",
+                "arduino_command": "RESET",
+                "message": "System reset from emergency"
+            }
+        else:
+            return {
+                "next_state": current_state,
+                "arduino_command": None,
+                "message": "Reset not allowed"
+            }
+
     if command == RESET_SYSTEM:
         if current_state == EMERGENCY:
             return {

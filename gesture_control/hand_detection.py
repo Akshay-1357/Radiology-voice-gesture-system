@@ -1,7 +1,7 @@
 # ======================================
 # hand_detection.py (FINAL CLEAN VERSION)
 # ======================================
-
+from core_logic.command_validator import RESET
 import cv2
 import mediapipe as mp
 import threading
@@ -48,26 +48,35 @@ def count_fingers(hand):
 
 # ---------------- GESTURE MAPPING ----------------
 def get_gesture(count, fingers):
+
     if count == 5:
         return START_SCAN          # ✋ Open hand
-    if count == 0:
-        return STOP_SCAN           # ✊ Fist
     if count == 2 and fingers[1] and fingers[2]:
-        return SCAN_COMPLETE       # ✌ Peace
+        return SCAN_COMPLETE  
+    # 👍 EMERGENCY FIRST (highest priority)
     if count == 1 and fingers[0]:
-        return EMERGENCY_STOP      # 👍 Thumb
-    return None
+        return EMERGENCY_STOP
+
+    # ✊ STOP only if NOT thumb
+    if count == 0:
+        return STOP_SCAN
+        # ✌ Peace
+
 
 
 # ---------------- MAIN ENTRY ----------------
 def start_gesture_control(state_manager, arduino):
 
     def run():
+       
+
         print("⏳ Warming up gesture system...")
         time.sleep(3)  # prevent false detection at startup
         print("✅ Gesture system ready")
         print("✋ Gesture control started")
 
+        reset_hold_start = None
+        RESET_HOLD_TIME = 2  # seconds
         cap = cv2.VideoCapture(0)
 
         last_time = 0
@@ -93,6 +102,20 @@ def start_gesture_control(state_manager, arduino):
                 count, fingers = count_fingers(hand)
                 command = get_gesture(count, fingers)
 
+            # 🔁 RESET GESTURE: PEACE SIGN HELD DURING EMERGENCY
+            if command == SCAN_COMPLETE:
+                if state_manager.get_state() == "EMERGENCY":
+                    if reset_hold_start is None:
+                        reset_hold_start = time.time()
+                    elif time.time() - reset_hold_start >= RESET_HOLD_TIME:
+                        command = RESET
+                        reset_hold_start = None
+                else:
+                    reset_hold_start = None
+            else:
+                reset_hold_start = None
+
+
             # 🔒 STATE-BASED SAFETY CHECK
             if command:
                 current_state = state_manager.get_state()
@@ -100,10 +123,15 @@ def start_gesture_control(state_manager, arduino):
                 # Emergency gesture allowed ONLY during SCANNING
                 if command == EMERGENCY_STOP and current_state != "SCANNING":
                     command = None
+                
+                    # Stop scan NOT allowed during EMERGENCY
+                if command == STOP_SCAN and current_state == "EMERGENCY":
+                    command = None
+
 
             # ---------------- EXECUTE COMMAND ----------------
             now = time.time()
-            if command and (now - last_time) > COOLDOWN:
+            if command and (command == RESET or (now - last_time) > COOLDOWN):
                 response = validate_and_process(
                     command,
                     state_manager.get_state()
