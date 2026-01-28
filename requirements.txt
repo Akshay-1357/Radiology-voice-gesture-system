@@ -1,28 +1,8 @@
-# -------------------------------
-# Voice Recognition
-# -------------------------------
-SpeechRecognition
-PyAudio
+speechrecognition
+pyaudio
 pyttsx3
-
-# -------------------------------
-# Computer Vision & Gesture
-# -------------------------------
 opencv-python
 mediapipe
-numpy
-
-# -------------------------------
-# Web Dashboard
-# -------------------------------
-Flask
-
-# -------------------------------
-# Hardware / Arduino Communication
-# -------------------------------
+flask
 pyserial
-
-# -------------------------------
-# Utilities (Safe to include)
-# -------------------------------
-requests
+numpy
