@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Radiology Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <div id="mode" class="mode READY">READY</div>
+        <div id="message" class="message">
+            System ready. Waiting for command.
+        </div>
+
+        <!-- RESET BUTTON -->
+        <button id="resetBtn" onclick="resetSystem()">RESET SYSTEM</button>
+    </div>
+</div>
+
+<script>
+function updateDashboard() {
+    fetch("/status")
+        .then(res => res.json())
+        .then(data => {
+            const modeEl = document.getElementById("mode");
+            const msgEl = document.getElementById("message");
+
+            modeEl.textContent = data.mode;
+            msgEl.textContent = data.message;
+            modeEl.className = "mode " + data.mode;
+        });
+}
+
+function resetSystem() {
+    fetch("/reset", { method: "POST" })
+        .then(() => {
+            console.log("System reset");
+        });
+}
+
+setInterval(updateDashboard, 1000);
+</script>
+
+</body>
+</html>

@@ -3,41 +3,37 @@
 # ===============================
 
 from core_logic.state_manager import (
+    INIT,
     IDLE,
+    INITIALIZING,
     SCANNING,
     COMPLETED,
+    STOPPING,
     EMERGENCY
 )
 
 # -------- COMMANDS --------
 START_SCAN = "START_SCAN"
 STOP_SCAN = "STOP_SCAN"
-EMERGENCY_STOP = "EMERGENCY_STOP"
 SCAN_COMPLETE = "SCAN_COMPLETE"
+EMERGENCY_STOP = "EMERGENCY_STOP"
+RESET_SYSTEM = "RESET_SYSTEM"
 
 VALID_COMMANDS = [
     START_SCAN,
     STOP_SCAN,
+    SCAN_COMPLETE,
     EMERGENCY_STOP,
-    SCAN_COMPLETE
+    RESET_SYSTEM
 ]
 
 
 def validate_and_process(command, current_state):
     """
-    Core decision-making function.
-
-    Parameters:
-        command (str): Command from voice / gesture
-        current_state (str): Current system state
-
-    Returns:
-        dict:
-            {
-                "next_state": str,
-                "arduino_command": str or None,
-                "message": str
-            }
+    Validates commands and decides:
+    - next state
+    - hardware command
+    - system message
     """
 
     # -------- INVALID COMMAND --------
@@ -55,55 +51,72 @@ def validate_and_process(command, current_state):
             "arduino_command": "EMERGENCY_STOP",
             "message": "Emergency stop activated"
         }
-
-    # -------- START SCAN --------
-    if command == START_SCAN:
-        if current_state == IDLE:
-            return {
-                "next_state": SCANNING,
-                "arduino_command": "START_SCAN",
-                "message": "Scan started"
-            }
-        else:
-            return {
-                "next_state": current_state,
-                "arduino_command": None,
-                "message": "Scan already running or not allowed"
-            }
-
-    # -------- STOP SCAN --------
-    if command == STOP_SCAN:
-        if current_state == SCANNING:
+    # -------- RESET SYSTEM --------
+    if command == RESET_SYSTEM:
+        if current_state == EMERGENCY:
             return {
                 "next_state": IDLE,
-                "arduino_command": "STOP_SCAN",
-                "message": "Scan stopped"
+                "arduino_command": "RESET",
+                "message": "System reset from emergency"
             }
         else:
             return {
                 "next_state": current_state,
                 "arduino_command": None,
-                "message": "No scan to stop"
+                "message": "Reset not required"
             }
 
+    # -------- SYSTEM RESET --------
+    if command == RESET_SYSTEM:
+        return {
+            "next_state": IDLE,
+            "arduino_command": "RESET",
+            "message": "System reset to IDLE"
+        }
+
+    # -------- START SCAN --------
+    if command == START_SCAN and current_state == IDLE:
+        return {
+            "next_state": INITIALIZING,
+            "arduino_command": "INITIALIZE_SYSTEM",
+            "message": "Initializing scan system"
+        }
+
+    # -------- INITIALIZATION COMPLETE → SCANNING --------
+    if current_state == INITIALIZING and command == START_SCAN:
+        return {
+            "next_state": SCANNING,
+            "arduino_command": "START_SCAN",
+            "message": "Scan started"
+        }
+
     # -------- SCAN COMPLETED --------
-    if command == SCAN_COMPLETE:
-        if current_state == SCANNING:
-            return {
-                "next_state": COMPLETED,
-                "arduino_command": "STOP_SCAN",
-                "message": "Scan completed successfully"
-            }
-        else:
-            return {
-                "next_state": current_state,
-                "arduino_command": None,
-                "message": "Scan not in progress"
-            }
+    if command == SCAN_COMPLETE and current_state == SCANNING:
+        return {
+            "next_state": COMPLETED,
+            "arduino_command": "STOP_SCAN",
+            "message": "Scan completed successfully"
+        }
+
+    # -------- STOP SCAN (GRACEFUL) --------
+    if command == STOP_SCAN and current_state == SCANNING:
+        return {
+            "next_state": STOPPING,
+            "arduino_command": "STOP_SCAN",
+            "message": "Stopping scan safely"
+        }
+
+    # -------- STOPPING COMPLETE --------
+    if current_state == STOPPING:
+        return {
+            "next_state": IDLE,
+            "arduino_command": None,
+            "message": "System safely stopped"
+        }
 
     # -------- FALLBACK --------
     return {
         "next_state": current_state,
         "arduino_command": None,
-        "message": "Unhandled case"
+        "message": "Command not allowed in current state"
     }
