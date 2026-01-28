@@ -14,20 +14,20 @@ c.Improve safety and workflow efficiency.
 
 LOGIC FLOW:
 
-Voice commands and hand-wave gestures are captured using a microphone and camera. These inputs are processed using Python for voice and gesture recognition. The processed commands are then sent to an Arduino UNO via serial communication, which executes the required control actions.
+Voice commands and hand-wave gestures are captured using a microphone and camera. These inputs are processed using Python for voice and gesture recognition. The processed commands are then sent to an Arudino UNO via serial communication, which executes the required control actions.
 
 ACTION ITEMS:
 
 1.HARDWARE:
 
-        a.1 × Arduino UNO
+        a.1 × Arudino UNO
         b.USB Cable (USB-A to Micro-USB / Type-C) – 1
         c.Computer/Laptop with microphone and camera 
 
 2.SOFTWARE:
 
         a.Python 3.x
-        b.Arduino IDE
+        b.Arudino IDE
         c.Python Libraries we used: SpeechRecognition, OpenCV, MediaPipe and NumPy
 
 EXECUTION:
@@ -35,8 +35,8 @@ EXECUTION:
         a.Capture voice commands using a microphone.
         b.Detect hand gestures using a camera.
         c.Process commands in Python.
-        d.Send control commands to Arduino UNO via serial communication.
-        e.Execute control actions through Arduino UNO. 
+        d.Send control commands to Arudino UNO via serial communication.
+        e.Execute control actions through Arudino UNO. 
 
 INTERFACE:
 
