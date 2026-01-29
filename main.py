@@ -8,16 +8,12 @@ from core_logic.state_manager import state_manager_instance
 from dashboard.app import start_dashboard
 from Voice_control.voice_recognition import start_voice_control
 from gesture_control.hand_detection import start_gesture_control
+from arduino_control.serial_comm import ArduinoController
 
 
-# ---------------- DUMMY ARDUINO ----------------
-# (Replace later with real Arduino class)
-class DummyArduino:
-    def send(self, command):
-        print(f"[DUMMY ARDUINO] {command}")
-
-
-arduino = DummyArduino()
+# ---------------- HARDWARE SETUP ----------------
+# Initializes real connection or falls back to dummy mode automatically
+arduino = ArduinoController(port="COM7", baud=9600)
 
 
 # ---------------- MAIN ----------------

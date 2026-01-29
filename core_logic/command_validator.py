@@ -112,7 +112,7 @@ def validate_and_process(command, current_state):
     if command == SCAN_COMPLETE and current_state == SCANNING:
         return {
             "next_state": COMPLETED,
-            "arduino_command": "STOP_SCAN",
+            "arduino_command": "SCAN_COMPLETED",
             "message": "Scan completed successfully"
         }
 
